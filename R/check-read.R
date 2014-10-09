@@ -30,20 +30,22 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
   if(sum(tab$diff != 0) > 4)
     warning("Warning ", sum(tab$diff != 0), " cohorts differ from targets.\n")
   print(tab)
-  i <- object.size(obs)
-  cat("Size of this week's file:", prettyNum(i, big.mark=","), "\n")
+  cat("\n")
   if(!is.null(obs_path_last)){
+    cat("Last week's file(s):\n")
     ilast <- read_dir(obs_path_last)
-    isize <- object.size(ilast)
-    cat("Size of last week's file:", prettyNum(isize, big.mark=","), "\n")
-    cat("Rows in last week's file:", prettyNum(nrow(ilast), big.mark=","), "\n")
+    cat("  Size:", objectSize(ilast), "\n")
+    cat("  Rows:", pN(nrow(ilast)), "\n")
   }
-  cat("Total number of rows:", prettyNum(nrow(obs), big.mark=","), "\n")
-  cat("Largest response rate: ", paste0(round(max(targ$rr) * 100, 2), "%"), "\n")
-  cat("Smallest response rate: ", paste0(round(min(targ$rr) * 100, 2), "%"), "\n")
-  cat("Average response rate: ", paste0(round(mean(targ$rr) * 100, 2), "%"), "\n")
-  cat("Total response rate: ", paste0(round(sum(targ$rr) * 100, 2), "%"), "\n")
-  cat("Read target size: ", paste0(round(sum(targ$target))), "\n")
+  cat("This week's file(s):\n")
+  cat("  Size:", objectSize(obs), "\n")
+  cat("  Rows:", pN(nrow(obs)), "\n\n")
+  cat("Response rates:\n")
+  cat("  Largest: ", paste0(round(max(targ$rr) * 100, 2), "%"), "\n")
+  cat("  Smallest: ", paste0(round(min(targ$rr) * 100, 2), "%"), "\n")
+  cat("  Average: ", paste0(round(mean(targ$rr) * 100, 2), "%"), "\n")
+  cat("  Total: ", paste0(round(sum(targ$rr) * 100, 2), "%"), "\n\n")
+  cat("Read Q complete target size: ", paste0(round(sum(targ$target))), "\n")
   if(!anyDuplicated(obs$LALVOTERID))
     cat("No duplicated LALVOTERID\n")
   else
@@ -73,5 +75,10 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
 
 #' @describeIn check_read Object size nicely formatted
 #' @export
-ob.size <- function(x){ print(object.size(x), unit="MB")}
+objectSize <- function(x){ paste0(round(object.size(x)/1e6, 3), "MB")}
 
+#' @describeIn check_read File size in "MB"
+#' @export
+fileSize <- function(x){
+  paste0(round(file.info(x)[['size']] / 1e6, 3), "MB")
+}
