@@ -2,5 +2,5 @@
 #'
 #' @param x Any numeric value
 #' @return Prettified number
-#' @exports
+#' @export
 pN <- function(x){prettyNum(x, big.mark = ",")}

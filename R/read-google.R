@@ -5,7 +5,7 @@
 #' @return google spreadsheet in the form of a data frame
 #' @import XML
 #' @import httr
-#' @exports
+#' @export
 #'
 readGoogle <- function(url, sheet = 1){
   #   library(XML)
