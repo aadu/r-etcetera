@@ -21,4 +21,8 @@ data frame of aggregated call list
 \description{
 Check segment reads prior to sending them
 }
+\section{Functions}{
+\itemize{
+\item \code{}: Object size nicely formatted
+}}
 
