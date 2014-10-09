@@ -71,6 +71,7 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
   return(obs)
 }
 
-#' @rdname check_read
+#' @describeIn check_read Object size nicely formatted
+#' @export
 ob.size <- function(x){ print(object.size(x), unit="MB")}
 
