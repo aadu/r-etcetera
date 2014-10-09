@@ -71,8 +71,6 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
   return(obs)
 }
 
-# obs_path = 'E:/Dropbox (Optimus)/0ptimus - Ricketts General/Analysis - Segment Monitoring/Segment Reads/10-09 Read/Sent to Vendor'
-# targ_path <- 'E:/Dropbox (Optimus)/0ptimus - Ricketts General/Analysis - Segment Monitoring/Segment Reads/10-09 Read/Checks/NE-calc.csv'
-# obs_path_last <- "E:/Dropbox (Optimus)/0ptimus - Ricketts General/Analysis - Segment Monitoring/Segment Reads/10-02 Read/Sent to vendor"
-# obs <- check_read(obs_path, targ_path, obs_path_last)
-# table(str_length(obs$VoterTelephones_Phone10))
+#' @rdname check_read
+ob.size <- function(x){ print(object.size(x), unit="MB")}
+
