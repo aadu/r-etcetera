@@ -1,8 +1,16 @@
 Package: dukeR
-Title: What the package does (one line)
+Title: Aaron's custom function library
 Version: 0.1
-Authors@R: "First Last <first.last@example.com> [aut, cre]"
-Description: What the package does (one paragraph)
+Authors@R: "Aaron Duke <aaron@0ptimus.com> [aut, cre]"
+Description: Custom function library
 Depends: R (>= 3.1.1)
-License: What license is it under?
+License: Proprietary
 LazyData: true
+Imports:
+  dplyr,
+  stringr,
+  DescTools,
+  yaml,
+  data.table,
+  httr,
+
