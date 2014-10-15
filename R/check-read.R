@@ -7,6 +7,7 @@
 #' @param obs_path_last Optional directory path to folder where previous weeks' call lists are located
 #' @return data frame of aggregated call list
 #' @include read-any.R
+#' @include read-dir.R
 #' @export
 check_read = function(obs_path, targ_path, obs_path_last = NULL){
   #   library(stringr)
@@ -14,18 +15,18 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
   #   source_url('https://gist.githubusercontent.com/aadu/fd0c34eb9ac473259dbf/raw/a75c63dfc724d83fbb5b5e15a3b3484bf938a372/io-utils.r')
   is.dir = function(x){file.info(x)[['isdir']]}
   .read_seg <- function(obs_path){
-  if(!is.dir(obs_path)){
-    obs <- read_any(obs_path)
-  } else {
-    files <- list.files(obs_path)
-    if(files > 1){
-      obs_files <- read_dir(obs_path, F)
-      obs <- do.call(rbind, obs_files)
+    if(!is.dir(obs_path)){
+      obs <- read_any(obs_path)
     } else {
-      obs <- read_dir(obs_path)
+      files <- list.files(obs_path)
+      if(files > 1){
+        obs_files <- read_dir(obs_path, F)
+        obs <- do.call(rbind, obs_files)
+      } else {
+        obs <- read_dir(obs_path)
+      }
     }
-  }
-  obs
+    obs
   }
   obs <- .read_seg(obs_path)
   targ <- read.csv(as.is=T, targ_path)
