@@ -11,10 +11,11 @@ read_dir = function(x, combine = T){
   library(dplyr)
   i <- file.info('E:/Dropbox (Optimus)/0ptimus - OH State Senate/Analysis - Segment Monitoring/Segment Reads/10-16 Read/Sent to Vendor/OHSD3.csv')
   is.dir = function(x){file.info(x)[['isdir']]}
-  if(!is.dir(x))
-    read_any(x)
-  else
-    files = list.files(x, "(?i).*[.](csv)|(txt)|(dat)$", full.names = T)
+  if(!is.dir(x)){
+    cat(x, "is not a directory.\n")
+    return(read_any(x))
+  }
+  files = list.files(x, "(?i).*[.](csv)|(txt)|(dat)$", full.names = T)
   if(length(grep("[.]csv$", files)))
     sep = ","
   else
