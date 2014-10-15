@@ -5,9 +5,16 @@
 #' @return Either a single aggregated data frame (if \code{combined = T} [default]) or a list of data frames (if \code{combined = F}).
 #' @import dplyr
 #' @export
+#' @include read-any.R
+#'
 read_dir = function(x, combine = T){
   library(dplyr)
-  files = list.files(x, "(?i).*[.](csv)|(txt)|(dat)$", full.names = T)
+  i <- file.info('E:/Dropbox (Optimus)/0ptimus - OH State Senate/Analysis - Segment Monitoring/Segment Reads/10-16 Read/Sent to Vendor/OHSD3.csv')
+  is.dir = function(x){file.info(x)[['isdir']]}
+  if(!is.dir(x))
+    read_any(x)
+  else
+    files = list.files(x, "(?i).*[.](csv)|(txt)|(dat)$", full.names = T)
   if(length(grep("[.]csv$", files)))
     sep = ","
   else
