@@ -3,7 +3,7 @@
 #' @param x Path to file
 #' @param to_keep Character vector of variables to keep (default = \code{NULL})
 #' @return data frame
-#' @import has.R
+#' @include has.R
 #' @export
 read_any <- function(x, to_keep = NULL){
   if(has(x, "[.]txt$"))

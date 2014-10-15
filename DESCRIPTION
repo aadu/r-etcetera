@@ -15,12 +15,12 @@ Imports:
     data.table,
     httr,
 Collate:
+    'has.R'
     'read-any.R'
     'check-read.R'
     'create-dir.R'
     'equal-groups.R'
     'formatters.R'
-    'has.R'
     'io.R'
     'lclip.R'
     'loggers.R'
