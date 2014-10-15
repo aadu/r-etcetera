@@ -13,6 +13,7 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
   #   library(devtools)
   #   source_url('https://gist.githubusercontent.com/aadu/fd0c34eb9ac473259dbf/raw/a75c63dfc724d83fbb5b5e15a3b3484bf938a372/io-utils.r')
   is.dir = function(x){file.info(x)[['isdir']]}
+  .read_seg <- function(obs_path){
   if(!is.dir(obs_path)){
     obs <- read_any(obs_path)
   } else {
@@ -24,6 +25,9 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
       obs <- read_dir(obs_path)
     }
   }
+  obs
+  }
+  obs <- .read_seg(obs_path)
   targ <- read.csv(as.is=T, targ_path)
   obs$cohort <- obs[[grep("(?i)cohort", names(obs), value=T)[1]]] # Save cohort as cohort
   tab <- as.data.frame.matrix(t(t(table(obs$cohort))))
@@ -39,7 +43,7 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
   cat("\n")
   if(!is.null(obs_path_last)){
     cat("Last week's file(s):\n")
-    ilast <- read_dir(obs_path_last)
+    ilast <- .read_seg(obs_path_last)
     cat("  Size:", objectSize(ilast), "\n")
     cat("  Rows:", pN(nrow(ilast)), "\n")
   }
