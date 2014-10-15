@@ -19,7 +19,7 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
       obs <- read_any(obs_path)
     } else {
       files <- list.files(obs_path)
-      if(files > 1){
+      if(length(files) > 1){
         obs_files <- read_dir(obs_path, F)
         obs <- do.call(rbind, obs_files)
       } else {
