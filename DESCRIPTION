@@ -26,7 +26,6 @@ Collate:
     'io.R'
     'lclip.R'
     'loggers.R'
-    'randomize-groups.R'
     'read-google.R'
     'source-dir.R'
     'vswitch.R'
