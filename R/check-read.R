@@ -36,6 +36,15 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
   row.names(tab) <- NULL
   tab <- tab[,c(2,1)]
   names(tab)[2] <- "actual"
+  wrong_cohorts <- tab$cohort[!tab$cohort %in% targ[['cohort']]]
+  if(length(wrong_cohorts)){
+    stop("Cohorts were observed that were not included in target file:\n", paste(wrong_cohorts, collapse=", "))
+  }
+  wrong_cohorts <- targ$cohort[!targ$cohort %in% tab[['cohort']]]
+  if(length(wrong_cohorts)){
+    warning("Cohorts were included in target file that were not observed file:\n", paste(wrong_cohorts, collapse=", "))
+  }
+  targ <- targ[targ$cohort %in% tab$cohort,]
   tab$goal <- targ$sample_size
   tab$diff <- tab$actual - tab$goal
   if(sum(tab$diff != 0) > 4)

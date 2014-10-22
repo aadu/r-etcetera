@@ -3,9 +3,10 @@
 #' @param x vector of ethnicities
 #' @return grouped ethnicities
 #' @export
+#' @import stringr
 #'
 group_ethnicities = function(x){
-  out <- as.character(x)
+  out <- str_trim(as.character(x))
   out[grep("(?i)unknown", x)] <- "Other"
   out[grep("(?i)asian", x)] <- "Other"
   out[grep("(?i)hispanic", x)] <- "Hispanic"
