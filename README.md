@@ -1,4 +1,4 @@
-Rsetup
-======
+rlib
+==========
 
-My personal setup and function library.
+A collection of useful and not-so-useful R functions.

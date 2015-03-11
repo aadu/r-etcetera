@@ -1,7 +1,7 @@
-Package: dukeR
+Package: rlib
 Title: Aaron's custom function library
 Version: 0.1
-Authors@R: "Aaron Duke <aaron@0ptimus.com> [aut, cre]"
+Authors@R: "Aaron Duke <dukuru@gmail.com> [aut, cre]"
 Description: Custom function library
 Depends:
     R (>= 3.1.1)
@@ -15,20 +15,20 @@ Imports:
     data.table,
     httr,
 Collate:
-    'balance.R'
-    'has.R'
-    'read-any.R'
-    'read-dir.R'
-    'check-read.R'
-    'create-dir.R'
-    'equal-groups.R'
-    'formatters.R'
-    'group-ages.R'
-    'group-ethnicities.R'
-    'io.R'
-    'lclip.R'
-    'loggers.R'
-    'read-google.R'
-    'source-dir.R'
-    'vswitch.R'
-    'with-leaners.R'
+    'balance.r'
+    'has.r'
+    'read-any.r'
+    'read-dir.r'
+    'check-read.r'
+    'create-dir.r'
+    'equal-groups.r'
+    'formatters.r'
+    'group-ages.r'
+    'group-ethnicities.r'
+    'io.r'
+    'lclip.r'
+    'loggers.r'
+    'read-google.r'
+    'source-dir.r'
+    'vswitch.r'
+    'with-leaners.r'
