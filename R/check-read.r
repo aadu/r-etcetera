@@ -1,4 +1,4 @@
-#' Check segment reads prior to sending them
+#' Check segment reads data prior to sending to vendor
 #'
 #' @import stringr
 #' @import devtools
@@ -9,18 +9,20 @@
 #' @include read-any.R
 #' @include read-dir.R
 #' @export
-check_read = function(obs_path, targ_path, obs_path_last = NULL){
-  #   library(stringr)
-  #   library(devtools)
-  #   source_url('https://gist.githubusercontent.com/aadu/fd0c34eb9ac473259dbf/raw/a75c63dfc724d83fbb5b5e15a3b3484bf938a372/io-utils.r')
-  is.dir = function(x){file.info(x)[['isdir']]}
+check_read <- function(obs_path, targ_path, obs_path_last = NULL){
+  is.dir <- function(x){file.info(x)[['isdir']]}
+  find_field <- function(data, regex){
+    field_name <- grep(regex, names(data), value=T)[1]
+    stopifnot(len(field_name))
+    data[[field_name]]
+  }
   .read_seg <- function(obs_path){
     if(!is.dir(obs_path)){
       obs <- read_any(obs_path)
     } else {
       files <- list.files(obs_path)
       if(length(files) > 1){
-        obs_files <- read_dir(obs_path, F)
+        obs_files <- read_dir(obs_path, FALSE)
         obs <- do.call(rbind, obs_files)
       } else {
         obs <- read_dir(obs_path)
@@ -29,26 +31,36 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
     obs
   }
   obs <- .read_seg(obs_path)
+  # Read in target info
   targ <- read.csv(as.is=T, targ_path)
-  obs$cohort <- obs[[grep("(?i)cohort", names(obs), value=T)[1]]] # Save cohort as cohort
+  # Rename fields
+  targ$cohort <- find_field(targ, '(?i)cohort')
+  targ$sample <- find_field(targ, '(?i)sample')
+  targ$target <- find_field(targ, '(?i)target')
+  targ$weight <- find_field(targ, '(?i)target')
+  targ$rr <- find_field(targ, '(?i)rr|response_rate')
+  obs$cohort <- find_field(obs, '(?i)cohort')
   tab <- as.data.frame.matrix(t(t(table(obs$cohort))))
   tab$cohort <- row.names(tab)
   row.names(tab) <- NULL
-  tab <- tab[,c(2,1)]
+  tab <- tab[ , c(2, 1)]
   names(tab)[2] <- "actual"
   wrong_cohorts <- tab$cohort[!tab$cohort %in% targ[['cohort']]]
   if(length(wrong_cohorts)){
-    stop("Cohorts were observed that were not included in target file:\n", paste(wrong_cohorts, collapse=", "))
+    stop("Cohorts were observed that were not included in target file:\n",
+         paste(wrong_cohorts, collapse=", "))
   }
   wrong_cohorts <- targ$cohort[!targ$cohort %in% tab[['cohort']]]
   if(length(wrong_cohorts)){
-    warning("Cohorts were included in target file that were not observed file:\n", paste(wrong_cohorts, collapse=", "))
+    warning("Cohorts were included in target file that were not observed file:\n",
+            paste(wrong_cohorts, collapse=", "))
   }
   targ <- targ[targ$cohort %in% tab$cohort,]
   tab$goal <- targ$sample_size
   tab$diff <- tab$actual - tab$goal
   if(sum(tab$diff != 0) > 4)
-    warning("Warning ", sum(tab$diff != 0), " cohorts differ from targets.\n")
+    warning("Warning ", sum(tab$diff != 0),
+            " cohorts differ from targets.\n")
   print(tab)
   cat("\n")
   if(!is.null(obs_path_last)){
@@ -80,11 +92,11 @@ check_read = function(obs_path, targ_path, obs_path_last = NULL){
     warning("Not all phone numbers are 10 digits long.\n")
   cat("First 20 cohorts\n")
   print(t(t(table(head(obs$cohort, 20)))))
-  if(length(grep("Voters_FirstName", names(obs))))
-    cat("Voters_FirstName in file.\n")
+  if(length(grep("first_name", names(obs))))
+    cat("first_name in file.\n")
   else
-    warning("Voters_FirstName not in file.\n")
-  if(length(grep("Voters_LastName", names(obs))))
+    warning("first_name not in file.\n")
+  if(length(grep("last_name", names(obs))))
     cat("Voters_LastName in file.\n")
   else
     warning("Voters_LastName not in file.\n")

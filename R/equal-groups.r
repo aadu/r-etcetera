@@ -7,7 +7,7 @@
 #' @param path Optional directory path for which to store the group files
 #' @return list of \code{k} data frames for each group
 #' @export
-equal_groups = function(x, k, n = NULL, compare = 'cohortcurrent', path = NULL){
+equal_groups = function(x, k, n=NULL, compare='cohortcurrent', path=NULL){
   if(is.null(n))
     n = floor(nrow(x) / k)
   x[[compare]] <- factor(x[[compare]])
@@ -24,7 +24,8 @@ equal_groups = function(x, k, n = NULL, compare = 'cohortcurrent', path = NULL){
     }
     # make a group x var matrix
     groups <- lapply(k, function(j)(x[[compare]][i[[j]]]))
-    groups <- Map(cbind, groups, sapply(k, function(x)(paste0("group", x))))
+    groups <- Map(cbind, groups, sapply(k,
+                  function(x)(paste0("group", x))))
     groups <- as.data.frame(do.call(rbind, groups))
     groups[] <- lapply(groups, factor)
     res <- chisq.test(table(groups))
@@ -38,6 +39,8 @@ equal_groups = function(x, k, n = NULL, compare = 'cohortcurrent', path = NULL){
   # Re-randomize the order of each group
   data = lapply(data, function(x)(x[sample(1:nrow(x)),]))
   if(!is.null(path))
-    lapply(k, function(x)(write.csv(data[[x]], file=paste0(path, "version-", LETTERS[x], ".csv"), row.names=FALSE, na="")))
+    lapply(k, function(x)(write.csv(data[[x]],
+           file=paste0(path, "version-", LETTERS[x], ".csv"),
+           row.names=FALSE, na="")))
   list(res = res, data = data)
 }

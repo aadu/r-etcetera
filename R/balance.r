@@ -8,17 +8,17 @@
 #' @import data.table
 #'
 balance = function(q, x, w){
-  x$cohort <- x[[grep('(?i)cohort', names(x), value=T)]]
-  x <- x[x[[q]] != "" & x[[q]] != "Refused to Answer",]
+  x$cohort <- x[[grep('(?i)cohort', names(x), value=TRUE)]]
+  x <- x[x[[q]] != "" & x[[q]] != "Refused to Answer", ]
   tab <- as.data.frame.matrix(table(x[['cohort']], x[[q]]))
   tab <- tab / apply(tab, 1, sum)
   tab$cohort <- row.names(tab); row.names(tab) <- NULL
   tab <- data.table(tab, key="cohort")
   w <- as.data.table(w)
   setkey(w, cohort)
-  tab <- tab[w[,.(cohort, weight)], nomatch=0]
-  w <- tab[,.(cohort, weight)]
-  tab[,c('cohort', 'weight'):= NULL]
+  tab <- tab[w[ , .(cohort, weight)], nomatch=0]
+  w <- tab[ , .(cohort, weight)]
+  tab[ , c('cohort', 'weight') := NULL]
   out <- apply(w$weight * tab, 2, sum)
   out / sum(out) * 100
 }
