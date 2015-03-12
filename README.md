@@ -1,4 +1,4 @@
 rlib
 ==========
 
-A collection of useful and not-so-useful R functions.
+A personal collection of useful and not-so-useful R functions.

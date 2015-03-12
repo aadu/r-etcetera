@@ -5,7 +5,7 @@ Authors@R: "Aaron Duke <dukuru@gmail.com> [aut, cre]"
 Description: Custom function library
 Depends:
     R (>= 3.1.1)
-License: Proprietary
+License: Personal
 LazyData: true
 Imports:
     dplyr,
@@ -14,21 +14,23 @@ Imports:
     yaml,
     data.table,
     httr,
+    parallel
 Collate:
-    'balance.r'
-    'has.r'
-    'read-any.r'
-    'read-dir.r'
-    'check-read.r'
-    'create-dir.r'
-    'equal-groups.r'
-    'formatters.r'
-    'group-ages.r'
-    'group-ethnicities.r'
-    'io.r'
-    'lclip.r'
-    'loggers.r'
-    'read-google.r'
-    'source-dir.r'
-    'vswitch.r'
-    'with-leaners.r'
+    'balance.R'
+    'has.R'
+    'read-any.R'
+    'read-dir.R'
+    'check-read.R'
+    'create-dir.R'
+    'equal-groups.R'
+    'formatters.R'
+    'group-ages.R'
+    'group-ethnicities.R'
+    'lclip.R'
+    'loggers.R'
+    'mc-near-zero-variance.R'
+    'read-google.R'
+    'source-dir.R'
+    'timed-try.R'
+    'vswitch.R'
+    'with-leaners.R'

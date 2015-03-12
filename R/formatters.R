@@ -3,9 +3,11 @@
 #' @export
 formatters <- function(x)(return(x))
 
+
 #' @describeIn formatters
 #' @export
 pN <- function(x){prettyNum(x, big.mark = ",")}
+
 
 #' @describeIn formatters
 #' @export

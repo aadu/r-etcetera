@@ -22,7 +22,7 @@ equal_groups = function(x, k, n=NULL, compare='cohortcurrent', path=NULL){
       i[[j]] <- sample(targets, n)
       targets <- targets[(!targets %in% i[[j]])]
     }
-    # make a group x var matrix
+    # Make a group x var matrix
     groups <- lapply(k, function(j)(x[[compare]][i[[j]]]))
     groups <- Map(cbind, groups, sapply(k,
                   function(x)(paste0("group", x))))
@@ -37,10 +37,10 @@ equal_groups = function(x, k, n=NULL, compare='cohortcurrent', path=NULL){
   }
   data = lapply(k, function(j)(x[i[[j]],]))
   # Re-randomize the order of each group
-  data = lapply(data, function(x)(x[sample(1:nrow(x)),]))
+  data = lapply(data, function(x)(x[sample(1:nrow(x)), ]))
   if(!is.null(path))
     lapply(k, function(x)(write.csv(data[[x]],
            file=paste0(path, "version-", LETTERS[x], ".csv"),
            row.names=FALSE, na="")))
-  list(res = res, data = data)
+  list(res=res, data=data)
 }
