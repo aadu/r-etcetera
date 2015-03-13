@@ -2,6 +2,7 @@
 
 export(.format_cm)
 export(any_missing)
+export(append_features)
 export(append_paths_to_config)
 export(balance)
 export(binarify)

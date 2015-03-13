@@ -8,7 +8,7 @@ has <- function(x, regex){
 }
 
 
-#' @describeIn has'
+#' @describeIn has
 #' @export
 safe_paths = function(...){
   paths = paste(..., "/", sep = '/', collapse = '/')

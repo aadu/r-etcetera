@@ -16,6 +16,8 @@ Imports:
     httr,
     parallel
 Collate:
+    'println.R'
+    'append-features.R'
     'balance.R'
     'binarify.R'
     'bins.R'
@@ -38,7 +40,6 @@ Collate:
     'install_packages.R'
     'lclip.R'
     'mc-near-zero-variance.R'
-    'println.R'
     'preprocess.R'
     'prepare-universe.R'
     'read-google.R'

@@ -2,9 +2,12 @@
 % Please edit documentation in R/has.R
 \name{has}
 \alias{has}
+\alias{safe_paths}
 \title{Regex to see if vector contains value}
 \usage{
 has(x, regex)
+
+safe_paths(...)
 }
 \arguments{
 \item{x}{vector to be evaluated for value}
@@ -17,4 +20,8 @@ Boolean, whether or not the vector contains the value
 \description{
 Regex to see if vector contains value
 }
+\section{Functions}{
+\itemize{
+\item \code{safe_paths}: 
+}}
 

@@ -14,6 +14,7 @@
 #' @include compare-models.R
 #' @include winner.R
 #' @include mc-near-zero-variance.R
+#' @include append-features.R
 #'
 run_models = function(config_path){
   cores = detectCores()
@@ -39,7 +40,7 @@ run_models = function(config_path){
   config = append_paths_to_config(config)
   ## PART 1: PREPARING THE UNIVERSES ##
   if(parts$load)
-    append_modeling_vars(config)
+    append_features(config)
   ## PART 1: PREPARING THE UNIVERSES ##
   if(parts$prepare)
     prepare_universes(config)
