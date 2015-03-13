@@ -4,16 +4,18 @@
 \alias{equal_groups}
 \title{Create three equal, randomized groups}
 \usage{
-equal_groups(x, k, n = NULL, compare = "cohortcurrent", path = NULL)
+equal_groups(x, k, n = NULL, compare = "cohort", path = NULL)
 }
 \arguments{
 \item{x}{Data frame from which to pull the groups}
 
 \item{k}{Number of groups}
 
-\item{n}{Optional, number of individual in each group, if left blank, the group will be split evenly into \code{k} groups}
+\item{n}{Optional, number of individual in each group, if left blank, the
+group will be split evenly into \code{k} groups}
 
-\item{compare}{Cohort label upon which to check if groups have been split in equivalent portions (default = 'cohortcurrent')}
+\item{compare}{Cohort label upon which to check if groups have been split
+in equivalent portions (default = 'cohortcurrent')}
 
 \item{path}{Optional directory path for which to store the group files}
 }

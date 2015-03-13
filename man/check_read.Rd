@@ -17,7 +17,8 @@ fileSize(x)
 
 \item{targ_path}{Path to calc.csv file}
 
-\item{obs_path_last}{Optional directory path to folder where previous weeks' call lists are located}
+\item{obs_path_last}{Optional directory path to folder where previous weeks'
+call lists are located}
 }
 \value{
 data frame of aggregated call list

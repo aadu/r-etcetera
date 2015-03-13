@@ -1,0 +1,218 @@
+---
+output: html_document
+---
+```{r, echo=F, results='hide', warning=FALSE}
+# model_name = "economy_improving"
+# winning_method = "bayesglm"
+# winning_method = "kernelpls"
+# winning_method = "rpart"
+# winning_method = "gbm"
+# winning_method = "pam"
+# winning_method = "lda"
+# winning_method = "glmnet"
+
+# config = list()
+# config$models_dir <- '/media/aaron/DATA/Dropbox (Optimus)/0ptimus - OH State Senate/Analysis - Vote Modeling/09-10 Ballot, Jobs, Economy/models/'
+# config$testsets_dir <- "/media/aaron/DATA/Dropbox (Optimus)/0ptimus - OH State Senate/Analysis - Vote Modeling/09-10 Ballot, Jobs, Economy/testsets/"
+# config$models <- list()
+# config$models$jobs2 <- "gbm"
+# saveRDS(config, "./devel/config.rds")
+# # saveRDS("jobs2", "./devel/model_name.rds")
+# model_name = readRDS("./devel/model_name.rds")
+# config = readRDS("./devel/config.rds")
+
+config = readRDS("config.rds")
+model_name = readRDS("model_name.rds")
+winning_method = config$models[[model_name]]
+# winning_method = "lda"
+m_path =  paste0(config$models_dir, model_name, "-", winning_method, ".rds")
+m = readRDS(m_path)  
+train_data = readRDS(paste0(config$testsets_dir, model_name, "-train.rds"))
+test_data = readRDS(paste0(config$testsets_dir, model_name, "-test.rds"))
+# test_data$CommercialDataLL_Cable_or_Dish_TelevisionSatelliteDish <- 0
+# train_data$CommercialDataLL_Cable_or_Dish_TelevisionSatelliteDish <- 0
+info <- m$modelInfo
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(caret))
+suppressPackageStartupMessages(library(pROC))
+suppressPackageStartupMessages(library(pls))
+suppressPackageStartupMessages(library('ggplot2'))
+suppressPackageStartupMessages(library(rpart))
+suppressPackageStartupMessages(library(gbm))
+suppressPackageStartupMessages(library(parallel))
+suppressPackageStartupMessages(library(pamr))
+suppressPackageStartupMessages(library(cluster))
+suppressPackageStartupMessages(library(MASS))
+suppressPackageStartupMessages(library(glmnet))
+suppressPackageStartupMessages(library(Matrix))
+tuned <- length(m$bestTune$parameter) != 1
+  
+str(m$finalModel)
+methods_tested = c("LDA", "PAM", "GBM", "LR")
+printc <- function(x){
+  if(!length(x))
+    return()
+  if(length(x) == 1)
+    return(x)
+  else if(length(x) == 2)
+    return(paste(x, collapse = " and "))
+  l <- length(x)
+  out <- paste(x[1:l-1], collapse=", ")
+  paste0(out, ", and ", x[l])    
+}
+
+printl <- function(x){
+  .ast <- function(x){paste("*", x)}
+  if(!length(x))
+    return()
+  x <- paste("*", x)
+  x <- paste0(x, "\n\n")
+  paste(x, collapse="")
+  
+}
+```
+
+# `r model_name`
+
+```{r, echo=F}
+#### Methods Tested
+# 
+# The **``r model_name``** model was testing using a number of different methods including `r printc(methods_tested)`.
+```
+
+#### Winning Method: `r info$label`
+
+`r paste(paste0("*", info$tags, "*"), collapse="/")`
+
+* The model took approximately `r round(sum(as.vector(m$times$everything), na.rm=T)/60, 2)` minutes to run on `r today()` at `r paste0(hour(now()), ":", minute(now()))`. 
+* Model call: ``r gsub(" +", " ", paste(capture.output(m$call), collapse=""))``. 
+* Control: `r m$control$number`-fold Cross Validation (``r m$control$method``) repeated `r m$control$repeats` time(s).
+* Size of training set: ``r prettyNum(nrow(train_data),big.mark = ",")``  
+* Size of test set: ``r prettyNum(nrow(test_data),big.mark = ",")``
+* Number of predictors used: ``r length(predictors(m))``
+
+#### Resampling Performance
+
+```{r, echo=F, results='asis'}
+knitr::kable(m$resample, digits=3, align=rep("c", ncol(m$resample)))
+```
+
+#### Calibration
+
+```{r, echo=F, results='asis', message=F, warning=F}
+
+bins = function(probs, obs, nm = 'predicted'){    
+  if(any(probs > 1)){
+    warning("Probabilities greater than 1 -- truncating.")
+    probs[probs > 1] <- 1
+  }
+  x = factor(binify(probs), levels=1:20)  
+  tab = data.frame(bin = 1:20)
+  tab[[nm]] <- t(t(table(x)))
+  tab[[nm]][tab[[nm]] == 0] <- ""
+  percs = unlist(mclapply(unique(x), function(i)(round(sum(obs[x==i] == 'yes', na.rm=T) / length(obs[x==i]) * 100 ))))  
+  names(percs) <-  unique(x)
+  percs <- t(t(percs[order(as.integer(names(percs)))]))  
+  percs <- data.frame(percs, bin = row.names(percs))    
+  both = merge(tab, percs, all=T)
+  both$percs[is.na(both$percs)] <- ""
+  both[[nm]] = ifelse(both[[nm]] != "", paste0("(",prettyNum(both[[nm]], big.mark=",", preserve.width = 'individual'), ")"), "")
+  both[['percs']] = ifelse(both[['percs']] != "", paste0(both[['percs']], "%"), "")
+  out = data.frame(paste(both[['percs']], both[[nm]]))
+  names(out) <- nm
+  out
+}
+
+binify = function(x, breaks = 20){  
+  inc = 1 / breaks
+  x[x==0] <- .0001
+  out = as.integer(cut(x, breaks=seq(0,1,inc), labels=seq(1,breaks)))  
+  return(out)
+}
+# library(CORElearn)
+# tra$obs <- factor(tra$obs, levels=c("yes", "no"), labels=c("0", "1"))
+# tes$obs <- factor(tes$obs, levels=c("yes", "no"), labels=c("0", "1"))
+# as.data.frame(calibrate(tra$obs, tra$prob, method = "isoReg"))
+# f1 <- glm(obs ~ prob, tra, family="binomial")
+# tra$cprob <- predict(f1, tra, type='response')
+
+tes <-data.frame(obs = test_data$Class, probs = predict(m, test_data, type='prob')$yes)
+row.names(tes) <- NULL
+tra <- data.frame(obs = train_data$Class, probs = predict(m, train_data, type='prob')$yes)
+row.names(tra) <- NULL
+cal <- glm(relevel(obs, ref='no') ~ probs, data = tra, family = binomial)
+tra$prob <- predict(cal, newdata = tra, type="response")
+tes$prob <- predict(cal, newdata = tes, type="response")
+## SAVE
+
+wm <- list()
+wm$model <- m
+wm$cal <- cal
+saveRDS(wm,paste0(config$winners_dir, model_name, "-winner.rds"))
+
+# hist(tra$prob_sig)
+# library(klaR)
+# BayesCal <- NaiveBayes(obs ~ prob, data=tra, usekernel = TRUE)
+# tra$prob_bayes <- predict(BayesCal, newdata = tra)$posterior[,'yes']
+# hist(tra$prob_bayes)
+
+out <- cbind(data.frame(bin = 1:20, prob = paste(seq(0, .95, .05), "-", seq(.05, 1, .05))), bins(tra$prob, tra$obs, nm = "Train"), bins(tes$prob, tes$obs, nm = "Test"))
+knitr::kable(out, align = c('l', "l", "c", "c"))
+```
+
+```{r, echo=F, fig.width=8, height=4}
+# library(gbm)
+# calibrate.plot(ifelse(tes$obs == 'yes', 1, 0), tes$prob, )
+# trellis.par.set(caretTheme())
+plot(calibration(obs ~ prob, data=tes))
+```
+
+
+#### Distribution of Probability Estimates
+
+```{r, echo=F, fig.width=9.5, fig.height=5.5}
+tra$Data <- "Train"
+tes$Data <- "Test"
+df <- rbind(tra, tes)
+p1 <- ggplot(df, aes(prob, fill=Data)) + theme_minimal()
+p1 +   geom_density(alpha=.80) +
+geom_histogram(aes(y = ..density..), color="black", alpha=.55, binwidth=.05)
+
+```
+
+
+`r if(length(m$bestTune$parameter) != 1) "#### Tuning Parameters"`
+
+```{r, echo=F, results='asis'}
+if(length(m$bestTune$parameter) != 1)
+  knitr::kable(t(m$best))
+#### Coefficients
+# *`r printc(m$coefnames)`*
+```
+
+
+```{r, echo=F, fig.width=9}
+if(tuned)
+  plot(m)
+```
+
+#### Results
+
+```{r, echo=F, results='asis'}
+knitr::kable(m$results, digits=3, align=rep('c', ncol(m$results)))
+```
+
+#### Features
+
+```{r, echo=F, results='asis'}
+try(imp <- varImp(m)$importance)
+try(imp[] <- imp[order(imp[1], decreasing=T),])
+try(names(imp)[1] <- "Importance")
+if("no" %in% colnames(imp))
+  try(imp$no <- NULL)
+imp$temp <- NA
+try(imp <- imp[row.names(imp) %in% predictors(m),])
+imp$temp <- NULL
+try(knitr::kable(imp, align=c('l'), digits = 2))
+```
+

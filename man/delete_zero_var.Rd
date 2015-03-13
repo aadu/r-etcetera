@@ -18,9 +18,10 @@ data.table reference (it does not pass by value remember)
 Delete all columns in a data table that have one unique value
 }
 \details{
-This function passes the data table by reference, so be warned that \code{data} will always be
-changed. If you run with delete = FALSE, it will list out the columns to be deleted, but will not delete them.
-This is advised while testing out regular expressions.
+This function passes the data table by reference, so be warned that
+\code{data} will always be changed. If you run with delete = FALSE, it will
+list out the columns to be deleted, but will not delete them. This is
+advised while testing out regular expressions.
 }
 \examples{
 #vf = delete_zero_var(vf)

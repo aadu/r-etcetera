@@ -4,15 +4,17 @@
 \alias{read_dir}
 \title{Read all (csv/tab/txt) files in a directory}
 \usage{
-read_dir(x, combine = T)
+read_dir(x, combine = TRUE)
 }
 \arguments{
-\item{combine}{Boolean, whether to return one data.frame or a list of data.frames}
+\item{combine}{Boolean, whether to return one data.frame or a list of
+data.frames}
 
 \item{path}{Directory path}
 }
 \value{
-Either a single aggregated data frame (if \code{combined = T} [default]) or a list of data frames (if \code{combined = F}).
+Either a single aggregated data frame (if \code{combined = T}
+[default]) or a list of data frames (if \code{combined = F}).
 }
 \description{
 Read all (csv/tab/txt) files in a directory

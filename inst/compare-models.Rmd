@@ -1,0 +1,148 @@
+---
+output:
+  html_document: default
+---
+
+```{r, echo=F}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(caret))
+
+config = readRDS('config.rds')
+m <- readRDS("model_name.rds")
+# config = readRDS('devel/config.rds')
+# m <- readRDS("devel/model_name.rds")
+
+results <- readRDS(paste0(config$metrics_dir, m, "-results.rds"))
+results$train$obs <- relevel(results$train$obs, ref='yes')
+results$test$obs <- relevel(results$test$obs, ref='yes')
+
+```
+
+# `r m`
+
+#### Train Metrics
+
+```{r, echo=F, results='asis'}
+
+display_cm = function(results, positive = 'yes') {
+  n = grep("obs", names(results), value=T, invert = T)
+  yesify = function(x){factor(ifelse(x > .5, 'yes', 'no'), levels=c('yes', 'no'))}
+  cm = .format_cm(n[1], confusionMatrix(yesify(results[,n[1]]), results$obs, positive='yes'), results$obs, results[[n[1]]])
+
+  if(length(n) > 1){
+    for(i in 2:length(n)){
+      cm = rbind(cm, .format_cm(n[i], confusionMatrix(yesify(results[,n[i]]), results$obs, positive=positive), results$obs, results[[n[i]]]))
+    }
+  }
+  return(cm)
+}
+
+.format_cm = function(label, cM, obs, probs){
+  .f1 = function(x) {return(round(as.vector(x), 4))} # Formatting function 1
+  .rmse = function(obs, probs){
+    obs = ifelse(obs == 'yes', 1, 0)
+    sqrt(sum((obs - probs)^2)/length(obs))
+  }
+  .cor = function(obs, probs){
+    obs =ifelse(obs == 'yes', 1, 0)
+    cor(obs, probs)
+  }
+  out = data.frame(Model = toupper(label),
+                   TP = cM$table['yes', 'yes'],
+                   FP = cM$table['yes', 'no'],
+                   TN = cM$table['no', 'no'],
+                   FN = cM$table['no', 'yes'],
+                   Accuracy = .f1(cM$overall['Accuracy']),
+                   Kappa = .f1(cM$overall['Kappa']),
+                   RMSE = .f1(.rmse(obs, probs)),
+                   r = .f1(.cor(obs, probs)),
+                   Sensitivity = .f1(cM$byClass['Sensitivity']),
+                   Specificity = .f1(cM$byClass['Specificity']),
+                   PPV = .f1(cM$byClass['Pos Pred Value']),
+                   NPV = .f1(cM$byClass['Neg Pred Value']),
+                   Prevalence = .f1(cM$byClass['Prevalence']),
+                   Detection = .f1(cM$byClass['Detection Rate']))
+  return( out )
+}
+
+# test-metric
+knitr::kable(display_cm(results$train))
+
+```
+
+#### Test Metrics
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(display_cm(results$test))
+```
+
+#### Train Comparison
+
+```{r, echo=FALSE, results='asis'}
+
+binify = function(x, breaks = 20){
+  inc = 1 / breaks
+  out = as.integer(cut(x, breaks=seq(0,1,inc), labels=seq(1,breaks)))
+  return(out)
+}
+bucketify = function(results, positive = 'yes', negative = 'no'){
+
+  n = grep("^obs$", names(results), value=T, invert = T)
+
+  fill_missing = function(x, nums = 1:20){
+    missing_nums = nums[!nums %in% x$bin]
+    if(length(missing_nums)){
+      newrows = data.frame(bin = missing_nums,
+                           percent = rep("", length(missing_nums)),
+                           n = rep("", length(missing_nums)))
+      x = rbind(x, newrows)
+      x = x[order(x$bin),]
+    }
+    x
+  }
+
+  add_rownames = function(x){cbind(data.frame(bin = as.integer(row.names(x))), x)}
+  bins = lapply(results[,n], function(x, obs)(x %>% binify %>%
+                                                as.data.frame %>%
+                                                cbind(obs) %>%
+                                                table %>%
+                                                as.data.frame.matrix %>%
+                                                add_rownames %>%
+                                                mutate(total = yes + no) %>%
+                                                mutate(percent = yes / total * 100) %>%
+                                                round %>%
+                                                mutate(percent = ifelse(percent == 0, "", paste0(percent, "% "))) %>%
+                                                mutate(n = ifelse(total == 0, "", paste0("(", total, ")"))) %>%
+                                                select(bin, percent, n) %>% fill_missing %>%
+                                                mutate(x = paste0(percent, n)) %>%
+                                                select(x)), results$obs)
+
+  for(n in names(bins)){
+    names(bins[[n]]) <- gsub("_PROB", "", toupper(n))
+  }
+  bins = as.data.frame(bins)
+
+  #select (percent, n))
+  bins = cbind(data.frame(bin = paste(seq(0,95, 5), "-", seq(5,100, 5), "%", sep="")), bins)
+  return(bins)
+}
+
+knitr::kable(bucketify(results$train))
+```
+
+
+#### Test Comparison
+
+```{r, echo=F, results='asis'}
+knitr::kable(bucketify(results$test))
+```
+
+#### Test Calibration
+```{r, echo=F, fig.width=9, height=5}
+n <- grep("obs", names(results$test), value=T, invert=T)
+calPlotData <- calibration(as.formula(paste('obs ~',  paste(n, collapse= " + "))), data = results$test)
+
+xyplot(calPlotData, auto.key = list(columns = (ncol(results$test) - 1)))
+```
+
