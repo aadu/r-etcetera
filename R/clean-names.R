@@ -15,12 +15,12 @@
 clean_names <- function(x){
   # First replace hyphens with underscores
   gsub("-", "_", x) %>%
-  # It's also bad if there are two hyphens in a row
-  gsub("__+", "_", .) %>%
-  # Then add a v before all variables that begin with a number
-  gsub("^(\\d)", "v\\1", .) %>%
-  # Then remove anything not alphanumeric or underscore
-  gsub("[^A-Za-z0-9_]", "", .)
+    # It's also bad if there are two hyphens in a row
+    gsub("__+", "_", .) %>%
+    # Then add a v before all variables that begin with a number
+    gsub("^(\\d)", "v\\1", .) %>%
+    # Then remove anything not alphanumeric or underscore
+    gsub("[^A-Za-z0-9_]", "", .)
 }
 
 
@@ -29,7 +29,7 @@ clean_names <- function(x){
 #' @import stringr
 #' @export
 shorten_names = function(x){
-  newnames <-  x %>% gsub("CommercialData", "", .) %>%
+  newnames <- x %>% gsub("CommercialData", "", .) %>%
     gsub("ElectionReturns", "", .) %>%
     gsub("Interest_in", "int", .) %>%
     gsub("Turnout", "", .) %>%

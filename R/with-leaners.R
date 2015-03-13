@@ -13,7 +13,7 @@ with_leaners = function(x, w, q1="Q2", q2="Q3"){
   x2 <- balance(q2, x, w)
   u <- x1[grep("(?i)unsure|undecided", names(x1))]
   u2 <- x2[grep("(?i)unsure|undecided", names(x2))]
-  out <- x1 + (x2*u/100)
-  out[[grep("(?i)unsure|undecided", names(out))]] <- u2 * (u/100)
+  out <- x1 + (x2 * u / 100)
+  out[[grep("(?i)unsure|undecided", names(out))]] <- u2 * (u / 100)
   out
 }

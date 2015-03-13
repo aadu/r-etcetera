@@ -7,18 +7,16 @@
 #' @import httr
 #' @export
 #'
-readGoogle <- function(url, sheet = 1){
-  #   library(XML)
-  #   library(httr)
+readGoogle <- function(url, sheet=1){
   r <- GET(url)
   html <- content(r)
   sheets <- readHTMLTable(html, header=FALSE, stringsAsFactors=FALSE)
   df <- sheets[[sheet]]
   dfClean <- function(df){
-    nms <- t(df[1,])
+    nms <- t(df[1, ])
     names(df) <- nms
-    df <- df[-1,-1]
-    row.names(df) <- seq(1,nrow(df))
+    df <- df[-1, -1]
+    row.names(df) <- seq(1, nrow(df))
     df
   }
   dfClean(df)

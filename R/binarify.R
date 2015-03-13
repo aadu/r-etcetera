@@ -47,8 +47,8 @@ binarify = function(data, verbose=FALSE, copy_data=FALSE) {
     # if one is named 'yes', 'agree', or 'support' then we choose that value
     i <- mclapply(df[,nm, with=FALSE], unique) %>%
       mclapply(function(x) (any(grepl(
-               "(^ye?s?)|(^agree)|(^support)", x,
-               ignore.case=T)))) %>%
+        "(^ye?s?)|(^agree)|(^support)", x,
+        ignore.case=T)))) %>%
       unlist %>% which %>% unname
     yeses <- nm[i]
     other <- nm[-i]

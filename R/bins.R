@@ -12,17 +12,18 @@ bins = function(probs, obs, nm='predicted'){
   tab = data.frame(bin=1:20)
   tab[[nm]] = t(t(table(x)))
   tab[[nm]][tab[[nm]] == 0] = ""
-  percs = unlist(mclapply(unique(x),
-                 function(i)(round(sum(obs[x==i] == 'yes',
-                             na.rm=T) / length(obs[x==i]) * 100))))
-  names(percs) <-  unique(x)
-  percs <- t(t(percs[order(as.integer(names(percs)))]))
-  percs <- data.frame(percs, bin=row.names(percs))
+  percs = unlist(mclapply(
+    unique(x), function(i)(round(sum(
+      obs[x==i] == 'yes', na.rm=T) / length(obs[x==i]) * 100))))
+  names(percs) = unique(x)
+  percs = t(t(percs[order(as.integer(names(percs)))]))
+  percs = data.frame(percs, bin=row.names(percs))
   both = merge(tab, percs, all=T)
   both$percs[is.na(both$percs)] = ""
-  both[[nm]] = ifelse(both[[nm]] != "",
-                      paste0("(", prettyNum(both[[nm]], big.mark=",",
-                      preserve.width = 'individual'), ")"), "")
+  both[[nm]] = ifelse(
+    both[[nm]] != "", paste0("(", prettyNum(both[[nm]], big.mark=",",
+                                            preserve.width = 'individual'),
+                             ")"), "")
   both[['percs']] = ifelse(both[['percs']] != "",
                            paste0(both[['percs']], "%"), "")
   out = data.frame(paste(both[['percs']], both[[nm]]))
@@ -35,7 +36,7 @@ bins = function(probs, obs, nm='predicted'){
 #' @export
 binify = function(x, breaks=20){
   inc = 1 / breaks
-  out = as.integer(cut(x, breaks=seq(0, 1, inc),
-                   labels=seq(1,breaks)))
-  out
+  x[x==0] = 0.0001
+  out = as.integer(cut(x, breaks=seq(0, 1, inc), labels=seq(1, breaks)))
+  return(out)
 }

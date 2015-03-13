@@ -19,14 +19,14 @@
 delete_all_missing = function(data, delete=TRUE){
   stopifnot(is.data.table(data))
   if(is.null(getOption('mc.cores')))
-    options(mc.cores = detectCores())
+    options(mc.cores=detectCores())
 
   missing <- mclapply(data, function(x)(if(all(is.na(x))) T else F))
   if(!any(unlist(missing))){
     warning("No all-missing columns identified.\nreturning unchanged.")
     return(data)
   }
-   all_missing= names(missing)[unlist(missing)]
+  all_missing= names(missing)[unlist(missing)]
   cat("The following", length(all_missing),
       "columns will be deleted:\n")
   for(each in all_missing){
@@ -49,4 +49,3 @@ any_missing = function(x){
       cat(names(x)[ix], "has missing values.\n")
     }
 }
-

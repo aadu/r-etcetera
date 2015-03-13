@@ -4,60 +4,62 @@
 #' @import devtools
 #' @param obs_path Directory path to folder where call lists are located
 #' @param targ_path Path to calc.csv file
-#' @param obs_path_last Optional directory path to folder where previous weeks' call lists are located
+#' @param obs_path_last Optional directory path to folder where previous weeks'
+#' call lists are located
 #' @return data frame of aggregated call list
 #' @include read-any.R
 #' @include read-dir.R
 #' @export
-check_read <- function(obs_path, targ_path, obs_path_last = NULL){
-  is.dir <- function(x){file.info(x)[['isdir']]}
-  find_field <- function(data, regex){
-    field_name <- grep(regex, names(data), value=T)[1]
+check_read = function(obs_path, targ_path, obs_path_last=NULL){
+  is.dir = function(x){file.info(x)[['isdir']]}
+  find_field = function(data, regex){
+    field_name = grep(regex, names(data), value=T)[1]
     stopifnot(len(field_name))
     data[[field_name]]
   }
-  .read_seg <- function(obs_path){
+  .read_seg = function(obs_path){
     if(!is.dir(obs_path)){
-      obs <- read_any(obs_path)
+      obs = read_any(obs_path)
     } else {
-      files <- list.files(obs_path)
+      files = list.files(obs_path)
       if(length(files) > 1){
-        obs_files <- read_dir(obs_path, FALSE)
-        obs <- do.call(rbind, obs_files)
+        obs_files = read_dir(obs_path, FALSE)
+        obs = do.call(rbind, obs_files)
       } else {
-        obs <- read_dir(obs_path)
+        obs = read_dir(obs_path)
       }
     }
     obs
   }
-  obs <- .read_seg(obs_path)
+  obs = .read_seg(obs_path)
   # Read in target info
-  targ <- read.csv(as.is=T, targ_path)
+  targ = read.csv(as.is=T, targ_path)
   # Rename fields
-  targ$cohort <- find_field(targ, '(?i)cohort')
-  targ$sample <- find_field(targ, '(?i)sample')
-  targ$target <- find_field(targ, '(?i)target')
-  targ$weight <- find_field(targ, '(?i)target')
-  targ$rr <- find_field(targ, '(?i)rr|response_rate')
-  obs$cohort <- find_field(obs, '(?i)cohort')
-  tab <- as.data.frame.matrix(t(t(table(obs$cohort))))
-  tab$cohort <- row.names(tab)
-  row.names(tab) <- NULL
-  tab <- tab[ , c(2, 1)]
-  names(tab)[2] <- "actual"
-  wrong_cohorts <- tab$cohort[!tab$cohort %in% targ[['cohort']]]
+  targ$cohort = find_field(targ, '(?i)cohort')
+  targ$sample = find_field(targ, '(?i)sample')
+  targ$target = find_field(targ, '(?i)target')
+  targ$weight = find_field(targ, '(?i)target')
+  targ$rr = find_field(targ, '(?i)rr|response_rate')
+  obs$cohort = find_field(obs, '(?i)cohort')
+  tab = as.data.frame.matrix(t(t(table(obs$cohort))))
+  tab$cohort = row.names(tab)
+  row.names(tab) = NULL
+  tab = tab[, c(2, 1)]
+  names(tab)[2] = "actual"
+  wrong_cohorts = tab$cohort[!tab$cohort %in% targ[['cohort']]]
   if(length(wrong_cohorts)){
     stop("Cohorts were observed that were not included in target file:\n",
          paste(wrong_cohorts, collapse=", "))
   }
-  wrong_cohorts <- targ$cohort[!targ$cohort %in% tab[['cohort']]]
+  wrong_cohorts = targ$cohort[!targ$cohort %in% tab[['cohort']]]
   if(length(wrong_cohorts)){
-    warning("Cohorts were included in target file that were not observed file:\n",
+    warning("Cohorts were included in target file that ",
+            "were not observed file:\n",
             paste(wrong_cohorts, collapse=", "))
   }
-  targ <- targ[targ$cohort %in% tab$cohort,]
-  tab$goal <- targ$sample_size
-  tab$diff <- tab$actual - tab$goal
+  targ = targ[targ$cohort %in% tab$cohort,]
+  tab$goal = targ$sample_size
+  tab$diff = tab$actual - tab$goal
   if(sum(tab$diff != 0) > 4)
     warning("Warning ", sum(tab$diff != 0),
             " cohorts differ from targets.\n")
@@ -65,7 +67,7 @@ check_read <- function(obs_path, targ_path, obs_path_last = NULL){
   cat("\n")
   if(!is.null(obs_path_last)){
     cat("Last week's file(s):\n")
-    ilast <- .read_seg(obs_path_last)
+    ilast = .read_seg(obs_path_last)
     cat("  Size:", objectSize(ilast), "\n")
     cat("  Rows:", pN(nrow(ilast)), "\n")
   }
@@ -107,10 +109,10 @@ check_read <- function(obs_path, targ_path, obs_path_last = NULL){
 
 #' @describeIn check_read Object size nicely formatted
 #' @export
-objectSize <- function(x){ paste0(round(object.size(x)/1e6, 3), "MB")}
+objectSize = function(x){ paste0(round(object.size(x) / 1e6, 3), "MB")}
 
 #' @describeIn check_read File size in "MB"
 #' @export
-fileSize <- function(x){
+fileSize = function(x){
   paste0(round(file.info(x)[['size']] / 1e6, 3), "MB")
 }

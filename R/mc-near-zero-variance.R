@@ -8,24 +8,24 @@
 #' @return Variables with zero or near-zero variance or corresponding metrics.
 #' @export
 #'
-mcNearZeroVar <- function (x, freqCut = 95/5, uniqueCut = 10, saveMetrics = FALSE) {
+mcNearZeroVar <- function (x, freqCut=95/5, uniqueCut=10, saveMetrics=FALSE) {
   freqRatio <-  unlist(mclapply(x, function(data) {
     t <- table(data[!is.na(data)])
     if (length(t) <= 1) {
       return(0)
     }
     w <- which.max(t)
-    return(max(t, na.rm = TRUE)/max(t[-w], na.rm = TRUE))
+    return(max(t, na.rm=TRUE)/max(t[-w], na.rm=TRUE))
   }))
-  lunique <- unlist(mclapply(x, function(data) length(unique(data[!is.na(data)]))))
-  percentUnique <- 100 * lunique/unlist(mclapply(x,length))
-  zeroVar <- (lunique == 1) | unlist(mclapply(x, function(data) all(is.na(data))))
+  lunique <- unlist(
+    mclapply(x,function(data)length(unique(data[!is.na(data)]))))
+  percentUnique <- 100 * lunique / unlist(mclapply(x, length))
+  zeroVar <- (lunique == 1) | unlist(
+    mclapply(x, function(data) all(is.na(data))))
   if (saveMetrics) {
-    out <- data.frame(freqRatio = freqRatio,
-                      percentUnique = percentUnique,
-                      zeroVar = zeroVar,
-                      nzv = (freqRatio > freqCut &
-                             percentUnique <= uniqueCut) | zeroVar)
+    out <- data.frame(
+      freqRatio=freqRatio, percentUnique=percentUnique, zeroVar=zeroVar,
+      nzv=(freqRatio > freqCut & percentUnique <= uniqueCut) | zeroVar)
   }
   else {
     out <- which((freqRatio > freqCut & percentUnique <= uniqueCut) | zeroVar)

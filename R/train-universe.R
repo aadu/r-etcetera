@@ -36,18 +36,18 @@ train_universe = function(m, config){
   run = config$methods
   # load up the training and test universes for the model
   train_data = readRDS(paste0(config$testsets_dir,
-                       m, "-train.rds"))
+                              m, "-train.rds"))
   test_data = readRDS(paste0(config$testsets_dir,
-                      m, "-test.rds"))
+                             m, "-test.rds"))
   # Define the test statistics
   fiveStats = function(...) c(twoClassSummary(...),
-                               defaultSummary(...))
+                              defaultSummary(...))
   # Examine all models with 10-fold cross-validation
   ctrl = trainControl(method="cv",
-                       number=10,
-                       summaryFunction=fiveStats,
-                       classProbs=TRUE,
-                       savePredictions=TRUE)
+                      number=10,
+                      summaryFunction=fiveStats,
+                      classProbs=TRUE,
+                      savePredictions=TRUE)
   # train models if specified in config
   train_model(run$rpart, "rpart", "rpart",
               data.frame(.cp=seq(0, .1, .02)))
@@ -65,8 +65,8 @@ train_universe = function(m, config){
               expand.grid(.maxdepth=2:10))
   train_model(run$sparseLDA, "sparseLDA", "sparseLDA")
   train_model(run$Boruta, "Boruta", c("randomForest",
-              "Boruta", "rFerns"), expand.grid(
-              .mtry=sqrt(ncol(train_data))))
+                                      "Boruta", "rFerns"), expand.grid(
+                                        .mtry=sqrt(ncol(train_data))))
   train_model(run$rf, "rf", "randomForest",
               expand.grid(.mtry=sqrt(ncol(train_data))))
   train_model(run$mda, "mda", "mda",
@@ -97,26 +97,25 @@ train_universes = function(config){
 
 #' @describeIn train_universe
 #' @export
-train_model = function(condition, method,
-                       libs=NULL, tuneGrid=NULL){
-    if(!condition)
-      return()
-      if(!is.null(libs)){
-        try(do.call(library, as.list(libs)))
-      }
-      println("Preparing to run ", method)
-      try(x <- train(Class ~ . ,
-                     data=train_data,
-                     trControl=ctrl,
-                     metric=test_metric,
-                     method=method,
-                     tuneGrid=tuneGrid)
-      )
-    try(println("Saving ", m, " at ",
-        paste0(config$models_dir, m, "-",
-               method, ".rds")))
-    if(exists('x')){
-      try(saveRDS(x, paste0(config$models_dir,
-          m, "-", method, ".rds")))
-    }
+train_model = function(condition, method, libs=NULL, tuneGrid=NULL){
+  if(!condition)
+    return()
+  if(!is.null(libs)){
+    try(do.call(library, as.list(libs)))
+  }
+  println("Preparing to run ", method)
+  try(x <- train(Class ~ . ,
+                 data=train_data,
+                 trControl=ctrl,
+                 metric=test_metric,
+                 method=method,
+                 tuneGrid=tuneGrid)
+  )
+  try(println("Saving ", m, " at ",
+              paste0(config$models_dir, m, "-",
+                     method, ".rds")))
+  if(exists('x')){
+    try(saveRDS(x, paste0(config$models_dir,
+                          m, "-", method, ".rds")))
+  }
 }

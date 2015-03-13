@@ -8,7 +8,7 @@
 #' @export
 #'
 scrub_income = function(x) {
- # CommercialData_EstimatedIncome
+  # CommercialData_EstimatedIncome
   x = str_trim(x)
   income = rep(NA_real_, length(x))
   income[x == ""]               = 0
@@ -26,6 +26,6 @@ scrub_income = function(x) {
   income[x == "$250000+"]       = 12
   income = income - 6  # Center
   income = income / 6  # Scale
-  income[is.na(income)] = median(income, na.rm=T)
+  income[is.na(income)] = median(income, na.rm=TRUE)
   return(income)
 }
