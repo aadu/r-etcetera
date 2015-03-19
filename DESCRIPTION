@@ -1,4 +1,4 @@
-Package: rlib
+Package: retcetera
 Title: Aaron's custom function library
 Version: 0.1
 Authors@R: "Aaron Duke <dukuru@gmail.com> [aut, cre]"
